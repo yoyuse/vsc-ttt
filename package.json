@@ -10,14 +10,22 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.dottt"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "extension.dottt",
+				"title": "Ttt: Do Ttt"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "extension.dottt",
+				"key": "alt+j",
+				"mac": "cmd+j",
+				"when": "editorTextFocus"
 			}
 		]
 	},

@@ -7,3 +7,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 - Initial release
+
+## [0.0.1] - 2019-03-26
+### Added
+- `Ttt: Do Ttt` (`extension.dottt`) command
+- `alt+j` (or `cmd+j` on Mac) keybinding when `editorTextFocus`
