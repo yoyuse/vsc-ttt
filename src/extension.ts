@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import {isString, isArray, isNull} from 'util';
+import * as cb from 'clipboardy';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -9,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "vsc-ttt" is now active!');
+	// console.log('Congratulations, your extension "vsc-ttt" is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
@@ -30,6 +31,15 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	let disposable1 = vscode.commands.registerCommand('extension.tttOnClipboard', () => {
+		let code = cb.readSync();
+		let text = decodeMix(code);
+		// vscode.window.showInformationMessage(`${code} → ${text}`);
+		cb.writeSync(text);
+	});
+
+	context.subscriptions.push(disposable1);
 }
 
 // this method is called when your extension is deactivated
@@ -1179,31 +1189,40 @@ const table =
   ]
 ;
 
-function decode_string(src: string) {
+function decode(src: string) {
 	let code = src.split('');
 	let t: any = table;
 	let dst = "";
+	let rem = "";
 	for (let ch of code) {
+		rem += ch;
 		let k = keys.indexOf(ch);
 		if (k < 0) {
 			t = table;
 			dst += ch;
+			rem = "";
 		} else {
 			if (!isArray(t) || t.length <= k) {
 				t = table;
 				dst += ch;
+				rem = "";
 				continue;
 			}
 			t = t[k];
 			if (isString(t)) {
 				dst += t;
+				rem = "";
 				t = table;
 			} else if (isNull(t)) {
 				t = table;
 			}
 		}
 	}
-	return dst;
+	return [dst, rem];
+}
+
+function decode_string(src: string) {
+	return decode(src)[0];
 }
 
 function do_ttt(editor: vscode.TextEditor) {
@@ -1233,8 +1252,8 @@ function do_ttt(editor: vscode.TextEditor) {
 		i -= 1;
 	}
 	if (ch === delimiter) {
-		delimitered = true
-		i -= 1
+		delimitered = true;
+		i -= 1;
 	}
 	while (0 <= i) {
 		ch = srccode[i];
@@ -1253,4 +1272,38 @@ function do_ttt(editor: vscode.TextEditor) {
 		editorEdit.replace(range, '');
 		editorEdit.insert(range.start, decoded);
 	});
+}
+
+function decodeMix1(str: string) {
+	let ret0 = "";
+	let ret1 = "";
+	let isCode = false;
+	while (str.match(/^(.*?)(:*)(:)(.*)$/)) {
+			let [left, sep, conv, right] = [RegExp.$1, RegExp.$2, RegExp.$3, RegExp.$4];
+			ret0 += (isCode ? left : decode(left).join("")) + sep;
+			ret1 += (isCode ? decode(left).join("") : left) + sep;
+			str = right;
+			isCode = !isCode;
+	}
+	ret0 += isCode ? str : decode(str).join("");
+	ret1 += isCode ? decode(str).join("") : str;
+	// return ret0;
+	return str === "" ? ret0 : ret1;
+}
+
+function decodeMix2(str: string) {
+	let ret = "";
+	let [left, sep, conv, right] = ["", "", ":", ""];
+	while (str.match(/^(.*?)([:@]*)([:@])(.*)$/)) {
+			[left, sep, conv, right] = [RegExp.$1, RegExp.$2, RegExp.$3, RegExp.$4];
+			ret += (conv === ":" ? left : decode(left).join("")) + sep;
+			str = right;
+	}
+	ret += conv === ":" ? decode(str).join("") : str;
+	return ret;
+}
+
+function decodeMix(str: string) {
+	// return decodeMix1(str);
+	return decodeMix2(str);
 }
