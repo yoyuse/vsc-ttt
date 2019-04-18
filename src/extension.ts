@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import {isString, isArray, isNull} from 'util';
-import * as cb from 'clipboardy';
+// import * as cb from 'clipboardy';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,14 +32,24 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 
-	let disposable1 = vscode.commands.registerCommand('extension.tttOnClipboard', () => {
-		let code = cb.readSync();
-		let text = decodeMix(code);
-		// vscode.window.showInformationMessage(`${code} → ${text}`);
-		cb.writeSync(text);
+	// let disposable1 = vscode.commands.registerCommand('extension.tttOnClipboard', () => {
+	// 	let code = cb.readSync();
+	// 	let text = decodeMix(code);
+	// 	// vscode.window.showInformationMessage(`${code} → ${text}`);
+	// 	cb.writeSync(text);
+	// });
+
+	// context.subscriptions.push(disposable1);
+
+	disposable = vscode.commands.registerCommand('extension.tttOnClipboard', () => {
+		vscode.env.clipboard.readText().then((code) => {
+			let text = decodeMix(code);
+			vscode.env.clipboard.writeText(text);
+			// vscode.window.showInformationMessage(`${code} → ${text}`);
+		});
 	});
 
-	context.subscriptions.push(disposable1);
+	context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated

@@ -8,6 +8,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Initial release
 
+## [0.0.3] - 2019-04-18
+
+- Now using the VS Code clipboard api (instead of clipboardy)
+
 ## [0.0.2] - 2019-04-17
 
 - `Ttt: Ttt On Clipboard` (`extension.tttOnClipboard`) command
