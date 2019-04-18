@@ -1,12 +1,9 @@
 # Change Log
 
-All notable changes to the "vsc-ttt" extension will be documented in this file.
+## [0.0.5] - 2019-04-18
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+- Now `Ttt: Do Ttt Via Clipboard` does ttt on selection if there is selection
+- Remove `Ttt: Ttt On Clipboard` (`extension.tttOnClipboard`) and `ctrl+j`
 
 ## [0.0.4] - 2019-04-18
 

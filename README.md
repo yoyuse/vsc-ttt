@@ -1,65 +1,47 @@
-# vsc-ttt README
+# vsc-ttt
 
-This is the README for your extension "vsc-ttt". After writing up a brief description, we recommend including the following sections.
+Yet another modeless Japanese input for VS Code
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+`alt+j` (Windows, Linux) または `cmd+j` (macOS) で、カーソルの左のコードを日本語に変換します。
+変換対象となるのは、カーソルより左、コード文字が続く限り (典型的には、日本語と ASCII の間の空白の手前まで) 、または区切り文字 `:` が現れるまでの範囲です。
+区切り文字 `:` は変換後に消去されます。
+日本語と ASCII の間に空白を空けたくないときは `:` を使用してください。
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+検索ボックスなどの中では、選択範囲があれば選択範囲を、なければ全体を変換します。
+コード文字列中では、`:` で無変換、`@` で変換を指定できます。
+たとえば、`VS Code:0rwj@ vs-ttt: jgjflf` を変換すると、`VS Code拡張 vs-ttt は…` のようになります。
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+VS Code 1.32.0 以降
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+設定項目はありません。
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+macOS では `cmd+j` (`View: Toggle Panel`) のキーバインドを上書きします。
+`View: Toggle Panel` を、たとえば `ctrl+cmd+j` に割り当て直すには、keybindings.json に次のように書きます。
+
+``` keybindings.json
+    {
+        "key": "ctrl+cmd+j",
+        "command": "workbench.action.togglePanel"
+    },
+```
+
+検索ボックスなどの中での変換では、コードの読み取りと変換結果の書き戻しにクリップボードを使用します。
+変換の後で、クリップボードの内容を変換前の内容に復元していますが、クリップボード監視アプリなどを使用していると、表示が煩わしいかもしれません。
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.4 - 2019-04-18
 
-### 1.0.0
+- `Ttt: Do Ttt Via Clipboard` (`extension.doTttViaClipboard`) コマンドを追加
 
-Initial release of ...
+### 0.0.1 - 2019-03-26
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- `Ttt: Do Ttt` (`extension.dottt`) コマンドだけを実装

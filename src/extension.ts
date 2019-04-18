@@ -2,7 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import {isString, isArray, isNull} from 'util';
-// import * as cb from 'clipboardy';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,25 +31,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 
-	// let disposable1 = vscode.commands.registerCommand('extension.tttOnClipboard', () => {
-	// 	let code = cb.readSync();
-	// 	let text = decodeMix(code);
-	// 	// vscode.window.showInformationMessage(`${code} → ${text}`);
-	// 	cb.writeSync(text);
-	// });
-
-	// context.subscriptions.push(disposable1);
-
-	disposable = vscode.commands.registerCommand('extension.tttOnClipboard', () => {
-		vscode.env.clipboard.readText().then((code) => {
-			let text = decodeMix(code);
-			vscode.env.clipboard.writeText(text);
-			// vscode.window.showInformationMessage(`${code} → ${text}`);
-		});
-	});
-
-	context.subscriptions.push(disposable);
-
 	disposable = vscode.commands.registerCommand('extension.doTttViaClipboard', doTttViaClipboard);
 
 	context.subscriptions.push(disposable);
@@ -63,28 +43,29 @@ export function deactivate() {}
 // vsc-ttt: do ttt via clipboard
 //
 
-const clipboard = vscode.env.clipboard;
-
-function getCode(): Thenable<string> {
-	return clipboard.readText();
-}
-
-function setText(text: string): Thenable<void> {
-	return clipboard.writeText(text);
-}
-
+// クリップボードを利用して選択範囲を変換する。選択範囲がなければ全体を変換する
 async function doTttViaClipboard(): Promise<void> {
-	let backup = await clipboard.readText();
-	await vscode.commands.executeCommand('editor.action.selectAll');
+	// クリップボードの内容をバックアップ
+	let backup = await vscode.env.clipboard.readText();
+	// 選択範囲の有無チェックのためクリップボードを空にする
+	await vscode.env.clipboard.writeText('');
+	// 選択範囲があるときはそれをコピー、なければ全選択してコピー
 	await vscode.commands.executeCommand('editor.action.clipboardCopyAction');
-	await vscode.env.clipboard.readText().then((code) => {
-		let text = decodeMix(code);
-		vscode.env.clipboard.writeText(text);
-		// vscode.window.showInformationMessage(`${code} → ${text}`);
-	});
+	let code = await vscode.env.clipboard.readText();
+	if (code === '') {
+		await vscode.commands.executeCommand('editor.action.selectAll');
+		await vscode.commands.executeCommand('editor.action.clipboardCopyAction');
+		code = await vscode.env.clipboard.readText();
+	}
+	// クリップボードにバックアップを戻す
+	await vscode.env.clipboard.writeText(backup);
+	// コピーした内容を変換しクリップボードに格納
+	let text = decodeMix(code);
+	await vscode.env.clipboard.writeText(text);
+	// クリップボードから貼り付け
 	await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
-	//
-	await clipboard.writeText(backup);
+	// クリップボードにバックアップを戻す
+	await vscode.env.clipboard.writeText(backup);
 }
 
 //
@@ -94,7 +75,7 @@ async function doTttViaClipboard(): Promise<void> {
 const keys: string = "1234567890qwertyuiopasdfghjkl;zxcvbnm,./";
 const delimiter: string = ":";
 
-const table = 
+const table =
   [
 	// 1
 	[
