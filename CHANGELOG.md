@@ -8,6 +8,18 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Initial release
 
+## [0.0.4] - 2019-04-18
+
+- `Ttt: Do Ttt Via Clipboard` (`extension.doTttViaClipboard`) command
+- `alt+j` (or `cmd+j` on macOS) keybinding when `!editorTextFocus && inputFocus`
+
+Tips
+
+- VS Code の検索ボックス等の中で `alt+j` (macOS なら `cmd+j`) だけでコードを日本語テキストに変換できます。クリップボードの内容は復元されます
+  - コードの書き方は [0.0.2] と同様で、`:` で無変換、`@` で変換
+  - 入力ボックス内のすべてが変換対象 (カーソルより左を変換対象とする通常の ttt 変換とは異なる)
+  - クリップボードを使用した後に元の内容を書き戻しているので、クリップボード監視アプリを使っていると、少しうるさいかも
+
 ## [0.0.3] - 2019-04-18
 
 - Now using the VS Code clipboard api (instead of clipboardy)

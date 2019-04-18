@@ -2,7 +2,7 @@
 	"name": "vsc-ttt",
 	"displayName": "vsc-ttt",
 	"description": "Yet another modeless Japanese input for VS Code",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"engines": {
 		"vscode": "^1.32.0"
 	},
@@ -11,7 +11,8 @@
 	],
 	"activationEvents": [
 		"onCommand:extension.dottt",
-		"onCommand:extension.tttOnClipboard"
+		"onCommand:extension.tttOnClipboard",
+		"onCommand:extension.doTttViaClipboard"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -23,6 +24,10 @@
 			{
 				"command": "extension.tttOnClipboard",
 				"title": "Ttt: Ttt On Clipboard"
+			},
+			{
+				"command": "extension.doTttViaClipboard",
+				"title": "Ttt: Do Ttt Via Clipboard"
 			}
 		],
 		"keybindings": [
@@ -34,9 +39,15 @@
 			},
 			{
 				"command": "extension.tttOnClipboard",
-				"key": "ctrl+j",
-				"mac": "cmd+j",
+				"key": "shift+alt+ctrl+j",
+				"mac": "shift+alt+cmd+j",
 				"when": "!editorTextFocus"
+			},
+			{
+				"command": "extension.doTttViaClipboard",
+				"key": "alt+j",
+				"mac": "cmd+j",
+				"when": "!editorTextFocus && inputFocus"
 			}
 		]
 	},

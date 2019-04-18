@@ -50,10 +50,42 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.doTttViaClipboard', doTttViaClipboard);
+
+	context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
+
+//
+// vsc-ttt: do ttt via clipboard
+//
+
+const clipboard = vscode.env.clipboard;
+
+function getCode(): Thenable<string> {
+	return clipboard.readText();
+}
+
+function setText(text: string): Thenable<void> {
+	return clipboard.writeText(text);
+}
+
+async function doTttViaClipboard(): Promise<void> {
+	let backup = await clipboard.readText();
+	await vscode.commands.executeCommand('editor.action.selectAll');
+	await vscode.commands.executeCommand('editor.action.clipboardCopyAction');
+	await vscode.env.clipboard.readText().then((code) => {
+		let text = decodeMix(code);
+		vscode.env.clipboard.writeText(text);
+		// vscode.window.showInformationMessage(`${code} → ${text}`);
+	});
+	await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
+	//
+	await clipboard.writeText(backup);
+}
 
 //
 // vsc-ttt
