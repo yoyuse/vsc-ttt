@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.6] - 2019-04-18
+
+- Support multiple selections for `Ttt: Do Ttt`
+
 ## [0.0.5] - 2019-04-18
 
 - Now `Ttt: Do Ttt Via Clipboard` does ttt on selection if there is selection

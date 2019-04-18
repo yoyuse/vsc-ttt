@@ -26,7 +26,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 		let editor = vscode.window.activeTextEditor;
 		if (!editor) {return;}
-		do_ttt(editor);
+		// do_ttt(editor);
+		doTTT(editor);
 	});
 
 	context.subscriptions.push(disposable);
@@ -1248,6 +1249,7 @@ function decode_string(src: string) {
 	return decode(src)[0];
 }
 
+/*
 function do_ttt(editor: vscode.TextEditor) {
 	let selection = editor.selection;
 	let row = selection.active.line;
@@ -1294,6 +1296,64 @@ function do_ttt(editor: vscode.TextEditor) {
 	editor.edit((editorEdit) => {
 		editorEdit.replace(range, '');
 		editorEdit.insert(range.start, decoded);
+	});
+}
+*/
+
+// ttt 変換を行う (マルチカーソル対応版)
+function doTTT(editor: vscode.TextEditor) {
+	editor.edit((editorEdit) => {
+		// マルチカーソル対応
+		editor.selections.map(selection => {
+			let row = selection.active.line;
+			let bol = new vscode.Position(row, 0);
+			let range = new vscode.Range(bol, selection.end);
+			let src = editor.document.getText(range);
+			//
+			let srccode = src.split('');
+			let ch = "";
+			let tail = "";
+			let body = "";
+			let head = "";
+			let delimitered = false;
+			let i = srccode.length - 1;
+			while (0 <= i) {
+				ch = srccode[i];
+				if (keys.includes(ch)) { break; }
+				tail = ch + tail;
+				i -= 1;
+			}
+			while (0 <= i) {
+				ch = srccode[i];
+				if (!keys.includes(ch)) { break; }
+				body = ch + body;
+				i -= 1;
+			}
+			if (ch === delimiter) {
+				delimitered = true;
+				i -= 1;
+			}
+			while (0 <= i) {
+				ch = srccode[i];
+				head = ch + head;
+				i -= 1;
+			}
+			//
+			let end = selection.end.translate(0, -tail.length);
+			let beg = end.translate(0, -body.length);
+			if (delimitered) {
+				beg = beg.translate(0, -1);
+			}
+			range = new vscode.Range(beg, end);
+			let decoded = decode_string(body);
+			// editor.edit((editorEdit) => {
+			editorEdit.replace(range, '');
+			editorEdit.insert(range.start, decoded);
+			// });
+			//
+			// return [range, decoded];
+		});
+		//
 	});
 }
 
