@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.0.8] - 2022-11-18
+
+- Refactor
+- Add "禮" (`43w6`), "剪" (`43lb`)
+
 ## [0.0.7] - 2021-02-14
 
 - Add publisher, repository and icon
