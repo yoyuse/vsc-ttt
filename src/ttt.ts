@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 
-type tableElement = string | tableElement[];
+// type tableElement = string | tableElement[];
+type tableElement = string | tableElementArray;
+interface tableElementArray extends Array<tableElement> {}
 
 export class Ttt {
     readonly keys = "1234567890qwertyuiopasdfghjkl;zxcvbnm,./";
@@ -201,7 +203,6 @@ export class Ttt {
 
     public decode(str: string): [string, string] {
         let t: tableElement = this.table;
-        // let t: any = this.table;
         let dst = "";
         let rem = "";
         for (let ch of str.split("")) {

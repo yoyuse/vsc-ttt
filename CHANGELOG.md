@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.0.9] - 2022-11-19
+
+- Fix type `tableElement`
+- Rename to `ttt.doTtt`, `ttt.doTttViaClipboard`
+
 ## [0.0.8] - 2022-11-18
 
 - Refactor

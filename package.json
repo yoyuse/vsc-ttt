@@ -8,7 +8,7 @@
 	},
 	"icon": "images/icon.png",
 	"description": "Yet another modeless Japanese input for VS Code",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"engines": {
 		"vscode": "^1.32.0"
 	},
@@ -16,30 +16,30 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.dottt",
-		"onCommand:extension.doTttViaClipboard"
+		"onCommand:ttt.doTtt",
+		"onCommand:ttt.doTttViaClipboard"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.dottt",
+				"command": "ttt.doTtt",
 				"title": "Ttt: Do Ttt"
 			},
 			{
-				"command": "extension.doTttViaClipboard",
+				"command": "ttt.doTttViaClipboard",
 				"title": "Ttt: Do Ttt Via Clipboard"
 			}
 		],
 		"keybindings": [
 			{
-				"command": "extension.dottt",
+				"command": "ttt.doTtt",
 				"key": "alt+j",
 				"mac": "cmd+j",
 				"when": "editorTextFocus"
 			},
 			{
-				"command": "extension.doTttViaClipboard",
+				"command": "ttt.doTttViaClipboard",
 				"key": "alt+j",
 				"mac": "cmd+j",
 				"when": "!editorTextFocus && inputFocus"
