@@ -8,7 +8,7 @@
 	},
 	"icon": "images/icon.png",
 	"description": "Yet another modeless Japanese input for VS Code",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"engines": {
 		"vscode": "^1.32.0"
 	},
@@ -17,7 +17,8 @@
 	],
 	"activationEvents": [
 		"onCommand:ttt.doTtt",
-		"onCommand:ttt.doTttViaClipboard"
+		"onCommand:ttt.doTttViaClipboard",
+		"onCommand:ttt.doKkt"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -29,6 +30,10 @@
 			{
 				"command": "ttt.doTttViaClipboard",
 				"title": "Ttt: Do Ttt Via Clipboard"
+			},
+			{
+				"command": "ttt.doKkt",
+				"title": "Ttt: Kana Kanji Transliteration"
 			}
 		],
 		"keybindings": [
@@ -43,6 +48,12 @@
 				"key": "alt+j",
 				"mac": "cmd+j",
 				"when": "!editorTextFocus && inputFocus"
+			},
+			{
+				"command": "ttt.doKkt",
+				"key": "alt+shift+j",
+				"mac": "cmd+shift+j",
+				"when": "editorTextFocus"
 			}
 		]
 	},
@@ -56,9 +67,12 @@
 	"devDependencies": {
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.14.4",
+		"@types/node-fetch": "^2.6.2",
 		"tslint": "^5.16.0",
 		"typescript": "^3.4.3",
 		"vscode": "^1.1.28"
 	},
-	"dependencies": {}
+	"dependencies": {
+		"node-fetch": "^2.6.7"
+	}
 }

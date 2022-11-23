@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { Ttt } from './ttt';
+import { doKkt } from './kkt';
 let ttt: Ttt;
 
 // this method is called when your extension is activated
@@ -19,23 +20,20 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('ttt.doTtt', () => {
 		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		// vscode.window.showInformationMessage('Hello World!');
-
-		//
-		// vsc-ttt
-		//
-
 		let editor = vscode.window.activeTextEditor;
-		if (!editor) {return;}
+		if (!editor) { return; }
 		ttt.doTtt(editor);
 	});
-
 	context.subscriptions.push(disposable);
 
-	disposable = vscode.commands.registerCommand('ttt.doTttViaClipboard', () => {ttt.doTttViaClipboard();});
+	disposable = vscode.commands.registerCommand('ttt.doTttViaClipboard', () => { ttt.doTttViaClipboard(); });
+	context.subscriptions.push(disposable);
 
+	disposable = vscode.commands.registerCommand('ttt.doKkt', () => {
+		let editor = vscode.window.activeTextEditor;
+		if (!editor) { return; }
+		doKkt(editor, ttt);
+	});
 	context.subscriptions.push(disposable);
 }
 

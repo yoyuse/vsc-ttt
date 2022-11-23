@@ -1,13 +1,17 @@
 import * as vscode from 'vscode';
 
-// type tableElement = string | tableElement[];
 type tableElement = string | tableElementArray;
 interface tableElementArray extends Array<tableElement> {}
+
+interface ReverseTable {
+    [name: string]: string[];
+}
 
 export class Ttt {
     readonly keys = "1234567890qwertyuiopasdfghjkl;zxcvbnm,./";
     readonly pattern = /(.*?)(:?([0-9a-z;,.\/]+))([^0-9a-z;,.\/]*)$/;
     public table: tableElement = [];
+    public reverseTable: ReverseTable = {};
     readonly tta = `
 *********************鄙***蛛**************
 ***************************************甦
@@ -182,9 +186,9 @@ export class Ttt {
     }
 
     private makeTable() {
-        let ttatable = this.makeSubtable(this.tta, (ch) => {return ch === "*" ? "" : ch;});
-        let ttltable = this.makeSubtable(this.ttl, (ch) => {return ch === "*" ? "" : ch;});
-        let ttrtable = this.makeSubtable(this.ttr, (ch) => {return ch === "*" ? "" : ch;});
+        let ttatable = this.makeSubtable(this.tta, (ch) => { return ch === "*" ? "" : ch; });
+        let ttltable = this.makeSubtable(this.ttl, (ch) => { return ch === "*" ? "" : ch; });
+        let ttrtable = this.makeSubtable(this.ttr, (ch) => { return ch === "*" ? "" : ch; });
         let ttttable = this.makeSubtable(this.ttc, (ch) => {
             switch (ch) {
                 case "*": return "";
@@ -199,6 +203,7 @@ export class Ttt {
 
     constructor() {
         this.makeTable();
+        this.makeReverseTable(this.table, "");
     }
 
     public decode(str: string): [string, string] {
@@ -230,31 +235,40 @@ export class Ttt {
         return this.decode(str)[0];
     }
 
+    public async doTttSub(selection: vscode.Selection, editor: vscode.TextEditor, editorEdit?: vscode.TextEditorEdit | undefined): Promise<vscode.Range> {
+        const selectionStart = selection.start;
+        const selectionRange = new vscode.Range(selection.start, selection.end);
+        let str = editor.document.getText(selectionRange);
+        let range: vscode.Range = selectionRange;
+        if (selection.isEmpty) {
+            const row = selection.active.line;
+            const bol = new vscode.Position(row, 0);
+            const left = editor.document.getText(new vscode.Range(bol, selection.end));
+            const m = this.pattern.exec(left);
+            if (!m) { return new vscode.Range(selection.start, selection.end); }
+            const [head, src, body, tail] = [m[1], m[2], m[3], m[4]];
+            str = body;
+            const start = selectionStart.translate(0, -(src + tail).length);
+            const end = start.translate(0, src.length);
+            range = new vscode.Range(start, end);
+        }
+        let dst = this.decodeString(str);
+        if (editorEdit) {
+            editorEdit.replace(range, "");
+            editorEdit.insert(range.start, dst);
+        } else {
+            await editor.edit((editorEdit) => {
+                editorEdit.replace(range, "");
+                editorEdit.insert(range.start, dst);
+            });
+        }
+        return new vscode.Range(range.start, range.start.translate(0, dst.length));
+    }
+
     public doTtt(editor: vscode.TextEditor) {
         editor.edit((editorEdit) => {
             editor.selections.map(selection => {
-                let start = selection.start;
-                let range = new vscode.Range(selection.start, selection.end);
-                let str = editor.document.getText(range);
-                let body = str;
-                if (selection.isEmpty) {
-                    let row = selection.active.line;
-                    let bol = new vscode.Position(row, 0);
-                    range = new vscode.Range(bol, selection.end);
-                    str = editor.document.getText(range);
-                    let m = this.pattern.exec(str);
-                    if (!m) {return;}
-                    let head = m[1];
-                    let src = m[2];
-                    body = m[3];
-                    let tail = m[4];
-                    start = start.translate(0, -src.length).translate(0, -tail.length);
-                    let end = start.translate(0, src.length);
-                    range = new vscode.Range(start, end);
-                }
-                let dst = this.decodeString(body);
-                editorEdit.replace(range, "");
-                editorEdit.insert(range.start, dst);
+                this.doTttSub(selection, editor, editorEdit);
             });
         });
     }
@@ -295,5 +309,35 @@ export class Ttt {
         await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
         // クリップボードにバックアップを戻す
         await vscode.env.clipboard.writeText(backup);
+    }
+
+    public makeReverseTable(table: tableElement, prefix: string = ""): ReverseTable {
+        const chars = this.keys.split("");
+        for (let k = 0; k < chars.length; k++) {
+            let ch = chars[k];
+            let tbl = table[k];
+            let code = prefix + ch
+            if (Array.isArray(tbl)) {
+                this.makeReverseTable(tbl, code);
+            } else if (typeof tbl === "string") {
+                if (!this.reverseTable[tbl]) { this.reverseTable[tbl] = new Array<string>(); }
+                this.reverseTable[tbl].push(code);
+            }
+        }
+        return this.reverseTable
+    }
+
+    public rev(char: string): string[] {
+        return this.reverseTable[char];
+    }
+
+    public codeHelpCh(ch: string, certain: string = ""): string {
+        let codes = this.rev(ch);
+        if (0 <= certain.indexOf(ch)) { return ch; }
+        return `${ch}${codes ? codes.map((code) => `<${code}>`).join("") : "<-->"}`
+    }
+
+    public codeHelpString(str:string, certain: string = ""): string {
+        return str.split("").map((ch) => this.codeHelpCh(ch, certain)).join("")
     }
 }

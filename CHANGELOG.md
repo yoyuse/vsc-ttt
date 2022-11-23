@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.10] - 2022-11-23
+
+- `Ttt: Kana Kanji Transliteration` (`cmd+shift+j`)
+
 ## [0.0.9] - 2022-11-19
 
 - Fix type `tableElement`
