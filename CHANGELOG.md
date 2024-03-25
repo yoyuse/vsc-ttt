@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.11] - 2024-03-25
+
+- TT-code 4.0
+
 ## [0.0.10] - 2022-11-23
 
 - `Ttt: Kana Kanji Transliteration` (`cmd+shift+j`)
