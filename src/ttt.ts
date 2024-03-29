@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
+import { reduce } from './tcaux';
 
 type tableElement = string | tableElementArray;
-interface tableElementArray extends Array<tableElement> {}
+interface tableElementArray extends Array<tableElement> { }
 
 interface ReverseTable {
     [name: string]: string[];
@@ -120,7 +121,7 @@ export class Ttt {
 *****蒐讐蹴酋什鰹葛恰鰍梶戎夙峻竣舜兜鞄樺椛叶駿楯淳醇曙噛鎌釜蒲竃渚薯藷恕鋤
 *****叱嫉悉蔀篠柿蛙馨浬骸偲柴屡蕊縞撹廓劃鈎蛎紗杓灼錫惹橿樫笠顎赫腫呪綬洲繍
 *****燦珊纂讃餐恢廻駕蛾臥斬仔屍孜斯凱蟹芥晦魁獅爾痔而蒔鎧蓋碍崖咳汐鴫竺宍雫
-*****埼碕鷺咋朔嘉伽俺牡桶柵窄鮭笹匙蝦茄苛禾珂拶*薩皐鯖峨俄霞迦嘩捌錆鮫晒撒
+*****埼碕鷺咋朔嘉伽俺牡桶柵窄鮭笹匙蝦茄苛禾珂拶$薩皐鯖峨俄霞迦嘩捌錆鮫晒撒
 *****痕艮些叉嵯艶燕焔掩怨沙瑳裟坐挫旺甥鴛薗苑哉塞采犀砦臆荻鴎鴬襖冴阪堺榊肴
 迄沫俣亦桝*****蜜箕蔓麿侭槻佃柘辻蔦牟粍稔蓑湊綴鍔椿潰壷牝姪冥椋鵡嬬紬吊剃悌
 孟摸麺緬棉*****餅勿杢儲蒙挺梯汀碇禎悶貰籾*尤諦蹄鄭釘鼎弥耶爺冶也擢鏑溺轍填
@@ -165,7 +166,7 @@ export class Ttt {
 **********儀偽騎飢輝尋尽迅酢吹犠欺擬戯宜帥*炊睡遂窮朽虐脚詰酔錘随髄崇
 **********鑑貫艦肝缶醸錠嘱殖辱幾岐頑陥閑侵唇娠慎浸軌祈棄棋忌紳薪診辛刃
 **********兆柱宙暖誕蛮妃扉披泌弟頂腸．潮疲碑罷微匹灯刀冬笛敵姫漂苗浜賓
-**********燃届毒銅童頻敏瓶怖扶拝俳，*馬浮符腐膚譜畑麦梅』肺賦赴附侮封
+**********燃届毒銅童頻敏瓶怖扶拝俳，&馬浮符腐膚譜畑麦梅』肺賦赴附侮封
 **********肥悲晩飯班伏覆沸噴墳腹貧氷俵鼻紛雰丙塀幣墓陛閉粉奮壁癖偏遍穂
 **********幕妹牧棒亡慕簿倣俸峰勇油鳴…脈崩抱泡砲縫覧卵翌幼預胞芳褒飽乏
 **********零隷林緑律傍剖坊妨帽劣暦齢麗霊忙冒紡肪膨炉錬廉裂烈謀僕墨撲朴
@@ -230,8 +231,8 @@ export class Ttt {
     private makeTable() {
         let ttwtable = this.makeSubtable(this.ttw, (ch) => { return ch === "*" ? "" : ch; });
         let ttbtable = this.makeSubtable(this.ttb, (ch) => { return ch === "*" ? "" : ch; });
-        let ttltable = this.makeSubtable(this.ttl, (ch) => { return ch === "*" ? "" : ch; });
-        let ttrtable = this.makeSubtable(this.ttr, (ch) => { return ch === "*" ? "" : ch; });
+        let ttltable = this.makeSubtable(this.ttl, (ch) => { return ch === "*" ? "" : ch === "$" ? "@m" : ch; });
+        let ttrtable = this.makeSubtable(this.ttr, (ch) => { return ch === "*" ? "" : ch === "&" ? "@b" : ch; });
         let ttttable = this.makeSubtable(this.ttc, (ch) => {
             switch (ch) {
                 case "*": return "";
@@ -297,6 +298,18 @@ export class Ttt {
             range = new vscode.Range(start, end);
         }
         let dst = this.decodeString(str);
+        //*
+        // SINGLECURSOR WITH TCAUX
+        await reduce(dst).then(async (r) => {
+            dst = r;
+            await editor.edit((editorEdit) => {
+                editorEdit.replace(range, "");
+                editorEdit.insert(range.start, dst);
+            });
+        }).then(undefined, (err) => { console.log(err); }); // .catch(err => console.error('error', err));
+        // console.log(dst);
+        /*/
+        // MULTICURSOR WITHOUT TCAUX
         if (editorEdit) {
             editorEdit.replace(range, "");
             editorEdit.insert(range.start, dst);
@@ -306,6 +319,7 @@ export class Ttt {
                 editorEdit.insert(range.start, dst);
             });
         }
+        //*/
         return new vscode.Range(range.start, range.start.translate(0, dst.length));
     }
 
@@ -317,16 +331,21 @@ export class Ttt {
         });
     }
 
-    public decodeMix(str: string): string {
+    // public decodeMix(str: string): string {
+    public async decodeMix(str: string): Promise<string> {
         let dst = "";
         let [left, sep, conv, right] = ["", "", ":", ""];
         let m;
         while ((m = /^(.*?)([:@]*)([:@])(.*)$/.exec(str)) !== null) {
             [left, sep, conv, right] = [m[1], m[2], m[3], m[4]];
-            dst += (conv === ":" ? left : this.decode(left).join("")) + sep;
+            // TCAUX
+            // dst += (conv === ":" ? left : this.decode(left).join("")) + sep;
+            dst += (conv === ":" ? left : await reduce(this.decode(left).join(""))) + sep;
             str = right;
         }
-        dst += conv === ":" ? this.decode(str).join("") : str;
+        // TCAUX
+        // dst += conv === ":" ? this.decode(str).join("") : str;
+        dst += conv === ":" ? await reduce(this.decode(str).join("")) : str;
         return dst;
     }
 
@@ -347,7 +366,9 @@ export class Ttt {
         // クリップボードにバックアップを戻す
         await vscode.env.clipboard.writeText(backup);
         // コピーした内容を変換しクリップボードに格納
-        let text = this.decodeMix(code);
+        // TCAUX
+        // let text = this.decodeMix(code);
+        let text = await this.decodeMix(code);
         await vscode.env.clipboard.writeText(text);
         // クリップボードから貼り付け
         await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
@@ -381,7 +402,7 @@ export class Ttt {
         return `${ch}${codes ? codes.map((code) => `<${code}>`).join("") : "<-->"}`
     }
 
-    public codeHelpString(str:string, certain: string = ""): string {
+    public codeHelpString(str: string, certain: string = ""): string {
         return str.split("").map((ch) => this.codeHelpCh(ch, certain)).join("")
     }
 }

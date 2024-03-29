@@ -3,7 +3,10 @@
 import * as vscode from 'vscode';
 import { Ttt } from './ttt';
 import { doKkt } from './kkt';
-let ttt: Ttt;
+
+// TCAUX
+// let ttt: Ttt;
+export let ttt: Ttt;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

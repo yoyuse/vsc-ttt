@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import fetch from "node-fetch";
 import { Ttt } from './ttt';
+import { showCodeHelp } from './tcaux';
 
 interface KanjiConverted {
     kana: string,
@@ -40,7 +41,5 @@ export const doKkt = async (editor: vscode.TextEditor, ttt: Ttt) => {
 		editorEdit.replace(range, "");
 		editorEdit.insert(range.start, dst);
 	});
-	let help = ttt.codeHelpString(dst, text);
-	vscode.window.setStatusBarMessage(help, 10000);
-	// vscode.window.showInformationMessage(help);
+	showCodeHelp(dst, text);
 }

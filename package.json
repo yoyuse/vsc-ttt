@@ -8,18 +8,14 @@
 	},
 	"icon": "images/icon.png",
 	"description": "Yet another modeless Japanese input for VS Code",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"engines": {
-		"vscode": "^1.32.0"
+		"vscode": "^1.75.0"
 	},
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-		"onCommand:ttt.doTtt",
-		"onCommand:ttt.doTttViaClipboard",
-		"onCommand:ttt.doKkt"
-	],
+	"activationEvents": [],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
@@ -54,6 +50,34 @@
 				"key": "alt+shift+j",
 				"mac": "cmd+shift+j",
 				"when": "editorTextFocus"
+			}
+		],
+		"configuration": [
+			{
+				"type": "object",
+				"title": "ttt configuration",
+				"properties": {
+					"ttt.defaultDictionaryDirectory": {
+						"type": "string",
+						"default": "",
+						"description": "Path for dictionaries"
+					},
+					"ttt.bushuRevFiles": {
+						"type": "string",
+						"default": "",
+						"description": "bushu.rev files"
+					},
+					"ttt.mazeYomFiles": {
+						"type": "string",
+						"default": "",
+						"description": "pd_kihon.yom files"
+					},
+					"ttt.itaijiMazFiles": {
+						"type": "string",
+						"default": "",
+						"description": "itaiji.maz files"
+					}
+				}
 			}
 		]
 	},

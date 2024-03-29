@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.12] - 2024-03-29
+
+- tcaux: `jfjf` (bushu), `fjfj` (maze, itaiji)
+- Not support multiple selections
+- Requires VS Code `^1.75.0`
+
 ## [0.0.11] - 2024-03-25
 
 - TT-code 4.0

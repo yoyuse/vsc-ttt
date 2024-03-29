@@ -18,13 +18,58 @@ Yet another modeless Japanese input for VS Code
 また、かな漢字変換された文字のコードを、ステータスバーに表示します。
 たとえば、`jendux;;ndjend` を変換すると `漢字変換` のようになります。
 
+### 補助変換
+
+辞書をインストールすると、部首合成変換・交ぜ書き変換の補助変換が利用できます。
+
+部首合成変換では、 `jfjf` に続く 2 文字が合成されます。
+たとえば、 `jfjfpwha` を変換すると `森` のようになります。
+再帰的な変換も可能です。
+たとえば、 `jfjfpgjfjfpwpw` を変換すると `淋` のようになります。
+変換できない組み合わせの場合は、 `jfjf` は `◆` となって残ります。
+
+交ぜ書き変換では、 `fjfj` に続く読み (漢字を含んでいてもよい) が変換されます。
+たとえば、 `fjfjml1fhr` を変換すると `完璧` のようになります。
+変換は単語変換ですが、異体字変換を含んでいます。
+たとえば、 `fjfjeg` を変換すると `廣` のようになります。
+活用する語は、活用語尾を除いた読み (語幹) で変換してください。
+変換できない読みの場合は、 `fjfj` は `◇` となって残ります。
+たとえば、 `fjfjug/gjshd` は `◇さみしい` に、 `fjfjug/gjs` は `淋し` などに変換されます。
+
 ## Requirements
 
-VS Code 1.32.0 以降
+VS Code 1.75.0 以降
 
 ## Extension Settings
 
-設定項目はありません。
+補助変換を利用するには、辞書が必要です。
+[kanchoku/tc](https://github.com/kanchoku/tc) の tcode ディレクトリから以下のファイルを入手して、適当なフォルダに置いてください。
+
+* 部首合成変換に必要: bushu.rev, symbol.rev
+* 交ぜ書き変換に必要: pd_kihon.yom, jukujiku.maz, greece.maz
+* 異体字変換に必要: itaiji.maz
+
+mazegaki.dic は必要ありません。
+
+### Ttt: Default Dictionary Directory
+
+* 辞書ファイルのあるフォルダのパスを指定します
+* 設定例: `~/tcode`
+
+### Ttt: Bushu Rev Files
+
+* 部首合成変換の辞書のファイル名をスペースで区切って指定します
+* 設定例: `symbol.rev bushu.rev`
+
+### Ttt: Maze Yom Files
+
+* 交ぜ書き変換の辞書のファイル名をスペースで区切って指定します
+* 設定例: `pd_kihon.yom jukujiku.maz greece.maz`
+
+### Ttt: Itaiji Maz Files
+
+* 異体字変換の辞書のファイル名をスペースで区切って指定します
+* 設定例: `itaiji.maz`
 
 ## Known Issues
 
