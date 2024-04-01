@@ -40,8 +40,6 @@ Yet another modeless Japanese input for VS Code
 
 VS Code 1.75.0 以降
 
-## Extension Settings
-
 補助変換を利用するには、辞書が必要です。
 [kanchoku/tc](https://github.com/kanchoku/tc) の tcode ディレクトリから以下のファイルを入手して、適当なフォルダに置いてください。
 
@@ -50,6 +48,23 @@ VS Code 1.75.0 以降
 * 異体字変換に必要: itaiji.maz
 
 mazegaki.dic は必要ありません。
+
+## Extension Settings
+
+### Ttt: Ttt Keyboard
+
+* キーボードのレイアウトを `QWERTY`/`Dvorak`/`Custom` から選択します
+* デフォルト値: `QWERTY`
+
+### Ttt: Ttt Keys
+
+* キーボードのレイアウトが `Custom` のときに使用する 40 個のキーを左上から右下に順に指定します
+* デフォルト値: `1234567890qwertyuiopasdfghjkl;zxcvbnm,./` (`QWERTY` レイアウトに対応)
+
+### Ttt: Ttt Delimiter
+
+* 日本語と ASCII の間の区切り文字を指定します
+* デフォルト値: `:`
 
 ### Ttt: Default Dictionary Directory
 

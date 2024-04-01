@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.0.13] - 2024-04-01
+
+- Support Dvorak keyboard
+- Add delimiter config
+
 ## [0.0.12] - 2024-03-29
 
 - tcaux: `jfjf` (bushu), `fjfj` (maze, itaiji)

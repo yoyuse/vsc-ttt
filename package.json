@@ -8,7 +8,7 @@
 	},
 	"icon": "images/icon.png",
 	"description": "Yet another modeless Japanese input for VS Code",
-	"version": "0.0.12",
+	"version": "0.0.13",
 	"engines": {
 		"vscode": "^1.75.0"
 	},
@@ -55,8 +55,24 @@
 		"configuration": [
 			{
 				"type": "object",
-				"title": "ttt configuration",
+				"title": "ttt",
 				"properties": {
+					"ttt.tttDelimiter": {
+						"type": "string",
+						"default": ":",
+						"description": "Delimiter between ASCII and Japanese"
+					},
+					"ttt.tttKeyboard": {
+						"type": "string",
+						"default": "QWERTY",
+						"enum": ["QWERTY", "Dvorak", "Custom"],
+						"description": "Keyboard type to use"
+					},
+					"ttt.tttKeys": {
+						"type": "string",
+						"default": "1234567890qwertyuiopasdfghjkl;zxcvbnm,./",
+						"description": "40 keys for custom keyboard type"
+					},
 					"ttt.defaultDictionaryDirectory": {
 						"type": "string",
 						"default": "",

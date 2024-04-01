@@ -1,16 +1,15 @@
 import * as vscode from 'vscode';
 import { reduce } from './tcaux';
+import { getConfiguration } from './utils';
 
 type tableElement = string | tableElementArray;
 interface tableElementArray extends Array<tableElement> { }
 
 interface ReverseTable {
-    [name: string]: string[];
+    [name: string]: number[][];
 }
 
 export class Ttt {
-    readonly keys = "1234567890qwertyuiopasdfghjkl;zxcvbnm,./";
-    readonly pattern = /(.*?)(:?([0-9a-z;,.\/]+))([^0-9a-z;,.\/]*)$/;
     public table: tableElement = [];
     public reverseTable: ReverseTable = {};
     readonly ttw = `
@@ -246,18 +245,61 @@ export class Ttt {
         this.table = ttttable;
     }
 
+    private getDelimiter(): string {
+        const delimiterColon = ":";
+        let tttDelimiter: string = getConfiguration().get<string>('tttDelimiter', delimiterColon);
+        if (tttDelimiter === "") { tttDelimiter = delimiterColon; } // XXX
+        return tttDelimiter;
+    }
+
+    private getKeys(): string {
+        const keysQWERTY = "1234567890qwertyuiopasdfghjkl;zxcvbnm,./";
+        const keysDvorak = "1234567890',.pyfgcrlaoeuidhtns;qjkxbmwvz";
+        const tttKeyboard = getConfiguration().get<string>('tttKeyboard');
+        let keys: string = keysQWERTY;
+        if (tttKeyboard === 'QWERTY') {
+            return keysQWERTY;
+        } else if (tttKeyboard === 'Dvorak') {
+            return keysDvorak;
+        } else if (tttKeyboard === 'Custom') {
+            const keys = getConfiguration().get<string>('tttKeys', keysQWERTY);
+            if (keys.length === 40) {
+                return keys;
+            } else {
+                vscode.window.showWarningMessage(`Invalid custom keys; Using QWERTY keys`);
+                return keysQWERTY;
+            }
+        }
+        return keys;
+    }
+
+    private optCharset(s: string): string {
+        return s.replace(/[\]\^\-\\]/g, '\\$&'); // XXX
+    }
+
+    private regexpQuote(s: string): string {
+        return s.replace(/[.\\+*?\[\^\]$(){}|]/g, '\\$&'); // XXX
+    }
+
+    private makePattern(): RegExp {
+        const keys = this.getKeys();
+        const delimiter = this.getDelimiter();
+        return new RegExp(`(.*?)(${this.regexpQuote(delimiter)}?([${this.optCharset(keys)}]+))([^${this.optCharset(keys)}]*)$`);
+    }
+
     constructor() {
         this.makeTable();
-        this.makeReverseTable(this.table, "");
+        this.makeReverseTable(this.table, []);
     }
 
     public decode(str: string): [string, string] {
+        const keys = this.getKeys();
         let t: tableElement = this.table;
         let dst = "";
         let rem = "";
         for (let ch of str.split("")) {
             rem += ch;
-            let k = this.keys.indexOf(ch);
+            let k = keys.indexOf(ch);
             if (k < 0) {
                 t = this.table;
                 dst += ch;
@@ -289,7 +331,7 @@ export class Ttt {
             const row = selection.active.line;
             const bol = new vscode.Position(row, 0);
             const left = editor.document.getText(new vscode.Range(bol, selection.end));
-            const m = this.pattern.exec(left);
+            const m = this.makePattern().exec(left);
             if (!m) { return new vscode.Range(selection.start, selection.end); }
             const [head, src, body, tail] = [m[1], m[2], m[3], m[4]];
             str = body;
@@ -376,16 +418,16 @@ export class Ttt {
         await vscode.env.clipboard.writeText(backup);
     }
 
-    public makeReverseTable(table: tableElement, prefix: string = ""): ReverseTable {
-        const chars = this.keys.split("");
+    public makeReverseTable(table: tableElement, prefix: number[] = []): ReverseTable {
+        const keys = this.getKeys();
+        const chars = keys.split("");
         for (let k = 0; k < chars.length; k++) {
-            let ch = chars[k];
             let tbl = table[k];
-            let code = prefix + ch
+            let code = prefix.concat([k]);
             if (Array.isArray(tbl)) {
                 this.makeReverseTable(tbl, code);
-            } else if (typeof tbl === "string") {
-                if (!this.reverseTable[tbl]) { this.reverseTable[tbl] = new Array<string>(); }
+            } else if (typeof tbl === "string" && tbl !== "") {
+                if (!this.reverseTable[tbl]) { this.reverseTable[tbl] = new Array<number[]>(); }
                 this.reverseTable[tbl].push(code);
             }
         }
@@ -393,7 +435,10 @@ export class Ttt {
     }
 
     public rev(char: string): string[] {
-        return this.reverseTable[char];
+        const keys = this.getKeys();
+        return this.reverseTable[char].map((code: number[]): string => {
+            return code.map((k: number): string => { return keys[k]; }).join("");
+        });
     }
 
     public codeHelpCh(ch: string, certain: string = ""): string {
