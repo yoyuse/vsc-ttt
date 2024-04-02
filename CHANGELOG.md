@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.14] - 2024-04-02
+
+- Support multiple selections for `doTtt` and `doKkt`
+
 ## [0.0.13] - 2024-04-01
 
 - Support Dvorak keyboard

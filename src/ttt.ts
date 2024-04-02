@@ -322,55 +322,35 @@ export class Ttt {
         return this.decode(str)[0];
     }
 
-    public async doTttSub(selection: vscode.Selection, editor: vscode.TextEditor, editorEdit?: vscode.TextEditorEdit | undefined): Promise<vscode.Range> {
+    public async doTttSub(selection: vscode.Selection, editor: vscode.TextEditor): Promise<vscode.Range> {
         const selectionStart = selection.start;
-        const selectionRange = new vscode.Range(selection.start, selection.end);
-        let str = editor.document.getText(selectionRange);
-        let range: vscode.Range = selectionRange;
+        let range = new vscode.Range(selection.start, selection.end);
+        let str = editor.document.getText(range);
         if (selection.isEmpty) {
             const row = selection.active.line;
             const bol = new vscode.Position(row, 0);
             const left = editor.document.getText(new vscode.Range(bol, selection.end));
             const m = this.makePattern().exec(left);
             if (!m) { return new vscode.Range(selection.start, selection.end); }
-            const [head, src, body, tail] = [m[1], m[2], m[3], m[4]];
+            const [_, src, body, tail] = [m[1], m[2], m[3], m[4]];
             str = body;
             const start = selectionStart.translate(0, -(src + tail).length);
             const end = start.translate(0, src.length);
             range = new vscode.Range(start, end);
         }
         let dst = this.decodeString(str);
-        //*
-        // SINGLECURSOR WITH TCAUX
-        await reduce(dst).then(async (r) => {
-            dst = r;
-            await editor.edit((editorEdit) => {
-                editorEdit.replace(range, "");
-                editorEdit.insert(range.start, dst);
-            });
-        }).then(undefined, (err) => { console.log(err); }); // .catch(err => console.error('error', err));
-        // console.log(dst);
-        /*/
-        // MULTICURSOR WITHOUT TCAUX
-        if (editorEdit) {
+        dst = await reduce(dst);
+        await editor.edit((editorEdit) => {
             editorEdit.replace(range, "");
             editorEdit.insert(range.start, dst);
-        } else {
-            await editor.edit((editorEdit) => {
-                editorEdit.replace(range, "");
-                editorEdit.insert(range.start, dst);
-            });
-        }
-        //*/
+        });
         return new vscode.Range(range.start, range.start.translate(0, dst.length));
     }
 
-    public doTtt(editor: vscode.TextEditor) {
-        editor.edit((editorEdit) => {
-            editor.selections.map(selection => {
-                this.doTttSub(selection, editor, editorEdit);
-            });
-        });
+    public async doTtt(editor: vscode.TextEditor) {
+        for (const selection of editor.selections) {
+            await this.doTttSub(selection, editor)
+        }
     }
 
     // public decodeMix(str: string): string {

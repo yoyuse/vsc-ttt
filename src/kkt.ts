@@ -16,30 +16,30 @@ const googleTransliterate = async (hiragana: string): Promise<KanjiConvertedList
 }
 
 export const doKkt = async (editor: vscode.TextEditor, ttt: Ttt) => {
-    const selection = editor.selection;
-    let range: vscode.Range;
-    if (selection.isEmpty || /[0-9a-z;,.\/]+$/.exec(editor.document.getText(selection))) {
-        range = await ttt.doTttSub(selection, editor);
-    } else {
-        range = new vscode.Range(selection.start, selection.end);
+    for (const selection of editor.selections) {
+        const range = await ttt.doTttSub(selection, editor);
+        await doKktSub(range, editor);
     }
+}
+
+const doKktSub = async (range: vscode.Range, editor: vscode.TextEditor) => {
     if (range.isEmpty) { return; }
-	const text = editor.document.getText(range);
-	const convertedList = await googleTransliterate(text);
-	let dst = "";
-	try {
-		for (let converted of convertedList) {
-			const kanji = converted.candidates;
-			await vscode.window.showQuickPick(kanji).then(selected => {
-				if (!selected) { throw new Error("canceled"); }
-				dst += selected;
-			});
-		}
-	} catch (e) { return; }
-	if (dst === text) { return; }
-	editor.edit((editorEdit) => {
-		editorEdit.replace(range, "");
-		editorEdit.insert(range.start, dst);
-	});
-	showCodeHelp(dst, text);
+    const text = editor.document.getText(range);
+    const convertedList = await googleTransliterate(text);
+    let dst = "";
+    try {
+        for (let converted of convertedList) {
+            const kanji = converted.candidates;
+            await vscode.window.showQuickPick(kanji).then(selected => {
+                if (!selected) { throw new Error("canceled"); }
+                dst += selected;
+            });
+        }
+    } catch (e) { return; }
+    if (dst === text) { return; }
+    await editor.edit((editorEdit) => {
+        editorEdit.replace(range, "");
+        editorEdit.insert(range.start, dst);
+    });
+    showCodeHelp(dst, text);
 }
