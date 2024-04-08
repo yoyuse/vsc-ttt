@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.15] - 2024-04-08
+
+- `doTttViaClipboard` selects all to convert
+
 ## [0.0.14] - 2024-04-02
 
 - Support multiple selections for `doTtt` and `doKkt`

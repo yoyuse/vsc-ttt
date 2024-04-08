@@ -371,10 +371,11 @@ export class Ttt {
         return dst;
     }
 
-    // クリップボードを利用して選択範囲を変換する。選択範囲がなければ全体を変換する
+    // クリップボードを利用して ~~選択範囲を変換する。選択範囲がなければ全体を~~ 変換する
     public async doTttViaClipboard(): Promise<void> {
         // クリップボードの内容をバックアップ
         let backup = await vscode.env.clipboard.readText();
+        /*
         // 選択範囲の有無チェックのためクリップボードを空にする
         await vscode.env.clipboard.writeText('');
         // 選択範囲があるときはそれをコピー、なければ全選択してコピー
@@ -385,12 +386,23 @@ export class Ttt {
             await vscode.commands.executeCommand('editor.action.clipboardCopyAction');
             code = await vscode.env.clipboard.readText();
         }
+        /*/
+        // 設定 (cmd+,) の検索欄では選択範囲の有無チェックができない
+        // クリップボードを空にする
+        await vscode.env.clipboard.writeText('');
+        // 全選択してコピー
+        await vscode.commands.executeCommand('editor.action.selectAll');
+        await vscode.commands.executeCommand('editor.action.clipboardCopyAction');
+        let code = await vscode.env.clipboard.readText();
+        //*/
         // クリップボードにバックアップを戻す
         await vscode.env.clipboard.writeText(backup);
+        if (code === '') { return; }
         // コピーした内容を変換しクリップボードに格納
         // TCAUX
         // let text = this.decodeMix(code);
         let text = await this.decodeMix(code);
+        if (text === code) { return; }
         await vscode.env.clipboard.writeText(text);
         // クリップボードから貼り付け
         await vscode.commands.executeCommand('editor.action.clipboardPasteAction');

@@ -4,15 +4,23 @@ Yet another modeless Japanese input for VS Code
 
 ## Features
 
+TT-code (T-Code の拡張) のコードを日本語にモードレスで変換します。
+
+### ttt 変換
+
 `alt+j` (Windows, Linux) または `cmd+j` (macOS) で、カーソルの左のコードを日本語に変換します。
 たとえば、`kryglp` を変換すると `日本語` のようになります。
 変換対象となるのは、カーソルより左、コード文字が続く限り (典型的には、日本語と ASCII の間の空白の手前まで)、または区切り文字 `:` が現れるまでの範囲です。
 区切り文字 `:` は変換後に消去されます。
 日本語と ASCII の間に空白を空けたくないときは `:` を使用してください。
 
-検索ボックスなどの中では、選択範囲があれば選択範囲を、なければ全体を変換します。
+### 検索ボックスなどでの変換
+
+検索ボックスなどの中では、 ~~選択範囲があれば選択範囲を、なければ~~ 全体を変換します。
 コード文字列中では、`:` で無変換、`@` で変換を指定できます。
 たとえば、`VS Code:0rwj@ vsc-ttt: jgjflf` を変換すると、`VS Code拡張 vsc-ttt は…` のようになります。
+
+### かな漢字変換
 
 `alt+shift+j` (Windows, Linux) または `cmd+shift+j` (macOS) で、カーソルの左の (ひらがなの) コードを変換したのち、さらに [Google CGI API for Japanese Input](https://www.google.co.jp/ime/cgiapi.html) により、かな漢字変換を行います。
 また、かな漢字変換された文字のコードを、ステータスバーに表示します。
